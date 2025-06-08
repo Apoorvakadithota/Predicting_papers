@@ -1,0 +1,52 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'application' // Add this line
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url = uri('https://repo.maven.apache.org/maven2/')
+    }
+}
+
+dependencies {
+    testImplementation libs.org.junit.jupiter.junit.jupiter.api
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+description = 'Raga_demo'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(Javadoc) {
+    options.encoding = 'UTF-8'
+}
+
+application {
+    mainClass = 'org.example.Main' // Specify the main class
+}
+
+jar {
+    manifest {
+        attributes(
+            'Main-Class': 'org.example.Main' // Specify the main class here as well
+        )
+    }
+}
