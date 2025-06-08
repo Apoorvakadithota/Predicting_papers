@@ -1,0 +1,140 @@
+
+## Experiment 10: Creating Build Pipelines with Azure DevOps (Maven)
+
+### Step-by-Step Execution with Commands
+
+---
+
+### 1. Create Maven Project in IntelliJ
+- Open IntelliJ IDEA > New Project
+- Choose "Maven" as build system
+- Give a project name (e.g., MyAzureApp) and finish
+- IntelliJ generates:
+  - pom.xml
+  - src/main/java
+  - src/test/java
+
+---
+
+### 2. Initialize Git Repository
+```bash
+git init
+git add .
+git commit -m "first commit"
+git branch -M main
+```
+
+---
+
+### 3. Configure Git (if not already)
+```bash
+git config --global user.name "your-username"
+git config --global user.email "your-email@example.com"
+```
+
+---
+
+### 4. Generate SSH Key for GitHub
+```bash
+ssh-keygen -t rsa -b 4096 -C "your-email@example.com"
+```
+- Press ENTER for all prompts
+
+Copy the key:
+```bash
+cat ~/.ssh/id_rsa.pub
+```
+
+---
+
+### 5. Add SSH Key to GitHub
+- Go to GitHub > Settings > SSH and GPG Keys
+- Click "New SSH Key"
+- Paste the copied key
+
+---
+
+### 6. Link Local Git to GitHub Repo
+```bash
+git remote set-url origin git@github.com:your-username/your-repo.git
+git remote -v
+git push --set-upstream origin main
+```
+
+---
+
+### 7. Create Azure DevOps Project
+- Visit https://dev.azure.com
+- Create a new project
+
+---
+
+### 8. Create Pipeline in Azure DevOps
+- Go to Pipelines > Create Pipeline
+- Choose GitHub (YAML)
+- Select your repo and approve access
+
+---
+
+### 9. Configure YAML for Maven Build
+Create or replace `azure-pipelines.yml` with:
+```yaml
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: JavaToolInstaller@0
+  inputs:
+    versionSpec: '17'
+    jdkArchitectureOption: 'x64'
+    jdkSourceOption: 'PreInstalled'
+
+- task: Maven@4
+  inputs:
+    mavenPomFile: 'pom.xml'
+    mavenOptions: '-Xmx3072m'
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: '17'
+    jdkArchitectureOption: 'x64'
+    publishJUnitResults: true
+    testResultsFiles: '**/target/surefire-reports/TEST-*.xml'
+    goals: 'clean test package'
+
+- task: PublishTestResults@2
+  inputs:
+    testResultsFiles: '**/target/surefire-reports/TEST-*.xml'
+    searchFolder: '$(System.DefaultWorkingDirectory)'
+    testRunTitle: 'Maven Unit Tests'
+```
+
+---
+
+### 10. Save and Run the Pipeline
+- Commit the YAML file
+- Click "Run pipeline"
+
+---
+
+### 11. View Results
+- View build logs and test reports in Azure DevOps
+- Go to the "Tests" tab to inspect results
+
+---
+
+### Summary of Git Commands
+```bash
+git init
+git add .
+git commit -m "first commit"
+git branch -M main
+git config --global user.name "your-name"
+git config --global user.email "your-email"
+ssh-keygen -t rsa -b 4096 -C "your-email"
+cat ~/.ssh/id_rsa.pub
+git remote set-url origin git@github.com:your/repo.git
+git remote -v
+git push --set-upstream origin main
+```
